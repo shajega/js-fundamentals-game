@@ -1,6 +1,7 @@
 import { syllabus } from './syllabus.js';
 
 const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+const UNIT_COUNT = 10;
 
 const MODES = {
   PRACTICE: 'practice',
@@ -86,12 +87,24 @@ const classLabs = [
 export const levels = [];
 let counter = 1;
 
-syllabus.forEach(week => {
-  week.quests.forEach(q => {
+syllabus.slice(0, UNIT_COUNT).forEach((week, index) => {
+  const lesson = unitLessons[index];
+  const unit = {
+    number: index + 1,
+    title: lesson.title,
+    sourceTitle: week.title,
+    ...lesson,
+    quests: week.quests
+  };
+
+  unit.quests.forEach(q => {
     q.id = counter++;
     q.weekTitle = week.title;
+    q.unitNumber = unit.number;
     levels.push(q);
   });
+
+  units.push(unit);
 });
 
 const state = {
@@ -323,11 +336,12 @@ function renderQuestSidebar() {
         renderLevel();
       }
     };
-    item.addEventListener('click', trigger);
-    item.addEventListener('keydown', (e) => {
+
+    item.addEventListener('click', selectUnit);
+    item.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        trigger(e);
+        selectUnit();
       }
     });
   });
@@ -411,8 +425,8 @@ function renderClassLab() {
 
 function renderLevel() {
   const container = document.getElementById('level-container');
-  const lvl = levels.find(l => l.id === state.currentLevel);
-  const isCompleted = lvl.id < state.unlockedLevel;
+  const unit = getActiveUnit();
+  const quest = getActiveQuest(unit);
 
   container.innerHTML = `
     ${renderModeIntro(MODES.QUEST)}
@@ -420,29 +434,147 @@ function renderLevel() {
       <h2>${lvl.weekTitle}: ${lvl.title}</h2>
       ${isCompleted ? '<span class="badge completed-badge" aria-label="Status: Completed">Completed</span>' : ''}
     </div>
-    <div class="level-card">
-      <p class="explanation">${lvl.explanation}</p>
-      
+
+    <section class="unit-section lesson-grid" aria-labelledby="lesson-heading">
+      <div class="lesson-card">
+        <p class="eyebrow">Explanation</p>
+        <h2 id="lesson-heading">Concept overview</h2>
+        <p>${unit.explanation}</p>
+      </div>
+      <div class="lesson-card sample-code-card">
+        <p class="eyebrow">Sample code</p>
+        <pre><code>${escapeHtml(unit.sampleCode)}</code></pre>
+      </div>
+    </section>
+
+    <section class="unit-section" aria-labelledby="practice-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">JS Practice</p>
+          <h2 id="practice-heading">Warm-up coding space</h2>
+        </div>
+        <span class="badge">No XP pressure</span>
+      </div>
       <div class="task-box">
-        <strong>Task</strong> ${lvl.task}
+        <strong>Practice prompt</strong> ${unit.practice.prompt}
       </div>
-      
-      <button id="btn-hint" class="hint-btn" aria-expanded="false" aria-controls="hint-text">💡 Need a hint?</button>
-      <div id="hint-text" class="hint-text hidden" aria-live="polite"><pre>${lvl.hint}</pre></div>
-
       <div class="editor-container">
-        <label for="code-editor" class="sr-only">Code Editor</label>
-        <textarea id="code-editor" spellcheck="false" aria-label="Write your JavaScript code here">${lvl.startCode}</textarea>
+        <label for="practice-editor" class="sr-only">Practice JavaScript editor</label>
+        <textarea id="practice-editor" spellcheck="false" aria-label="Write practice JavaScript code here">${escapeHtml(unit.practice.starter)}</textarea>
       </div>
-
       <div class="action-bar">
-        <button id="btn-run" class="primary-btn">▶ Run Code</button>
+        <button id="btn-practice-run" class="primary-btn">▶ Run Practice</button>
+        <button id="btn-practice-reset" class="secondary-btn">Reset Practice</button>
+      </div>
+      <div id="practice-output" class="feedback-box hidden" aria-live="polite"></div>
+    </section>
+
+    <section class="unit-section" aria-labelledby="quest-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Quest</p>
+          <h2 id="quest-heading">Guided challenge</h2>
+        </div>
+        <span class="badge">${unit.quests.length} quests</span>
+      </div>
+      <div class="quest-switcher" aria-label="Quest selector">
+        ${unit.quests.map(unitQuest => {
+          const isActive = unitQuest.id === quest.id;
+          const isCompleted = unitQuest.id < state.unlockedLevel;
+          return `
+            <button class="quest-chip ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}" data-quest-id="${unitQuest.id}" aria-pressed="${isActive}">
+              ${isCompleted ? '✓ ' : ''}${unitQuest.shortTitle || unitQuest.title}
+            </button>
+          `;
+        }).join('')}
+      </div>
+      ${renderQuestWorkspace(quest)}
+    </section>
+
+    <section class="unit-section" aria-labelledby="lab-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Lab</p>
+          <h2 id="lab-heading">${unit.lab.title}</h2>
+        </div>
+        <span class="badge">${unit.lab.duration}</span>
+      </div>
+      <div class="lab-layout">
+        <article class="lab-brief">
+          <p class="explanation">${unit.lab.objective}</p>
+          <div class="task-box">
+            <strong>Lab steps</strong>
+            <ol class="lab-list">
+              ${unit.lab.steps.map(step => `<li>${step}</li>`).join('')}
+            </ol>
+          </div>
+        </article>
+        <section class="level-card">
+          <div class="editor-container">
+            <label for="lab-editor" class="sr-only">Class lab JavaScript editor</label>
+            <textarea id="lab-editor" spellcheck="false" aria-label="Write class lab JavaScript code here">${escapeHtml(unit.lab.starter)}</textarea>
+          </div>
+          <div class="action-bar">
+            <button id="btn-lab-run" class="primary-btn">▶ Run Lab Code</button>
+            <button id="btn-lab-reset" class="secondary-btn">Reset Lab</button>
+          </div>
+          <div id="lab-output" class="feedback-box hidden" aria-live="polite"></div>
+        </section>
+      </div>
+    </section>
+  `;
+
+  wireUnitInteractions(unit);
+}
+
+function renderQuestWorkspace(quest) {
+  const isCompleted = quest.id < state.unlockedLevel;
+
+  return `
+    <div class="quest-workspace">
+      <div class="level-header">
+        <h3>${quest.weekTitle}: ${quest.title}</h3>
+        ${isCompleted ? '<span class="badge completed-badge" aria-label="Status: Completed">Completed</span>' : ''}
+      </div>
+      <p class="explanation">${quest.explanation}</p>
+      <div class="task-box">
+        <strong>Task</strong> ${quest.task}
+      </div>
+      <button id="btn-hint" class="hint-btn" aria-expanded="false" aria-controls="hint-text">💡 Need a hint?</button>
+      <div id="hint-text" class="hint-text hidden" aria-live="polite"><pre>${escapeHtml(quest.hint)}</pre></div>
+      <div class="editor-container">
+        <label for="code-editor" class="sr-only">Quest Code Editor</label>
+        <textarea id="code-editor" spellcheck="false" aria-label="Write your JavaScript quest solution here">${escapeHtml(quest.startCode)}</textarea>
+      </div>
+      <div class="action-bar">
+        <button id="btn-run" class="primary-btn">▶ Run Quest</button>
         <button id="btn-next" class="secondary-btn hidden">Next Quest ➔</button>
       </div>
-
       <div id="feedback-box" class="feedback-box hidden" aria-live="assertive"></div>
     </div>
   `;
+}
+
+function wireUnitInteractions(unit) {
+  document.getElementById('btn-practice-run').addEventListener('click', () => runUserCode('practice-editor', 'practice-output'));
+  document.getElementById('btn-practice-reset').addEventListener('click', () => {
+    document.getElementById('practice-editor').value = unit.practice.starter;
+    document.getElementById('practice-output').classList.add('hidden');
+  });
+
+  document.getElementById('btn-lab-run').addEventListener('click', () => runUserCode('lab-editor', 'lab-output'));
+  document.getElementById('btn-lab-reset').addEventListener('click', () => {
+    document.getElementById('lab-editor').value = unit.lab.starter;
+    document.getElementById('lab-output').classList.add('hidden');
+  });
+
+  document.querySelectorAll('[data-quest-id]').forEach(button => {
+    button.addEventListener('click', () => {
+      state.currentQuestId = parseInt(button.dataset.questId);
+      saveState();
+      renderUnit();
+    });
+  });
 
   document.getElementById('btn-hint').addEventListener('click', (e) => {
     const hintText = document.getElementById('hint-text');
@@ -468,7 +600,7 @@ function showFeedback(type, message, targetId = 'feedback-box') {
   const feedbackBox = document.getElementById(targetId);
   feedbackBox.classList.remove('hidden');
   feedbackBox.className = `feedback-box ${type}`;
-  
+
   const icon = type === 'success' ? '✅' : '❌';
   feedbackBox.innerHTML = `<strong>${icon}</strong> <div>${message}</div>`;
 }
@@ -516,7 +648,8 @@ function runLabCode() {
 
 async function runCode() {
   const code = document.getElementById('code-editor').value;
-  const lvl = levels[state.currentLevel - 1];
+  const unit = getActiveUnit();
+  const quest = getActiveQuest(unit);
 
   if (!code.trim()) {
     showFeedback('error', 'Your code editor is empty. Try typing your solution!');
@@ -524,39 +657,39 @@ async function runCode() {
   }
 
   try {
-    if (lvl.evalMode === 'string') {
-        const testFunc = new Function('code', `${lvl.test}`);
-        const result = testFunc(code);
-        if (result === true) {
-            showFeedback('success', lvl.successMessage);
-            handleSuccess();
-        } else {
-            showFeedback('error', "That code doesn't quite match the requirement. Keep trying!");
-        }
-        return;
+    if (quest.evalMode === 'string') {
+      const testFunc = new Function('code', `${quest.test}`);
+      const result = testFunc(code);
+      if (result === true) {
+        showFeedback('success', quest.successMessage);
+        handleQuestSuccess(quest);
+      } else {
+        showFeedback('error', "That code doesn't quite match the requirement. Keep trying!");
+      }
+      return;
     }
 
     const wrappedCode = `
       return (async function() {
         try {
           ${code}
-          ${lvl.test}
+          ${quest.test}
         } catch (e) {
           throw e;
         }
       })();
     `;
-    
+
     const testFunc = new AsyncFunction(wrappedCode);
     const result = await testFunc();
 
-    if (result === lvl.expected || (typeof result === 'string' && typeof lvl.expected === 'string' && result.includes(lvl.expected))) {
-      showFeedback('success', lvl.successMessage);
-      handleSuccess();
+    if (result === quest.expected || (typeof result === 'string' && typeof quest.expected === 'string' && result.includes(quest.expected))) {
+      showFeedback('success', quest.successMessage);
+      handleQuestSuccess(quest);
     } else if (result === undefined) {
       showFeedback('error', "Hmm, I didn't find the expected variable or return value.");
     } else {
-      showFeedback('error', `Almost! Expected <b>${lvl.expected}</b>, but your code produced <b>${result}</b>.`);
+      showFeedback('error', `Almost! Expected <b>${escapeHtml(quest.expected)}</b>, but your code produced <b>${escapeHtml(result)}</b>.`);
     }
   } catch (error) {
     let friendlyError = error.message;
@@ -565,24 +698,35 @@ async function runCode() {
     } else if (error instanceof SyntaxError) {
       friendlyError = `Looks like a typo! Check brackets and semicolons. (${error.message})`;
     }
-    showFeedback('error', `<b>Error:</b> ${friendlyError}`);
+    showFeedback('error', `<b>Error:</b> ${escapeHtml(friendlyError)}`);
   }
 }
 
-function handleSuccess() {
-  if (state.currentLevel === state.unlockedLevel) {
+function handleQuestSuccess(quest) {
+  if (quest.id === state.unlockedLevel) {
     state.xp += 150;
     state.unlockedLevel += 1;
     saveState();
-    
+
     document.getElementById('xp-display').innerText = state.xp;
     renderQuestSidebar();
   }
-  
-  if (state.currentLevel < levels.length) {
+
+  if (quest.id < levels.length) {
     document.getElementById('btn-next').classList.remove('hidden');
     document.getElementById('btn-next').scrollIntoView({behavior: 'smooth'});
   }
+}
+
+function goToNextQuest() {
+  const nextQuest = levels.find(quest => quest.id === state.currentQuestId + 1);
+  if (!nextQuest) return;
+
+  state.currentQuestId = nextQuest.id;
+  state.currentUnit = Math.min(nextQuest.unitNumber, UNIT_COUNT);
+  saveState();
+  renderSidebar();
+  renderUnit();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

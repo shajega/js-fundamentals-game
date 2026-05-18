@@ -57,7 +57,7 @@ body {
 
 /* --- Header --- */
 .app-header {
-    height: 70px;
+    min-height: 82px;
     background: var(--card);
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -359,8 +359,8 @@ body {
 .content {
     flex: 1;
     padding: 32px;
-    display: grid;
-    grid-template-rows: auto 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 24px;
     overflow-y: auto;
 }
