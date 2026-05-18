@@ -1,12 +1,10 @@
 # JS Quest: Classroom Edition
 
-A browser-based JavaScript fundamentals game for classroom use. The app is organised as **Unit 1 through Unit 10** in the sidebar. Each unit brings the lesson flow together in one place:
+A browser-based JavaScript fundamentals game for classroom use. Students can now move between three learning modes:
 
-1. **Explanation** — a teacher-friendly concept overview.
-2. **Sample Code** — a readable example for modelling the concept.
-3. **JS Practice** — a low-stakes coding warm-up with runnable output.
-4. **Quest** — the guided challenge sequence with XP, hints, and completion tracking.
-5. **Lab** — a class activity brief with starter code and a runnable lab workspace.
+- **Practice JS** — low-stakes drills with a free-form code runner for warm-ups and revision.
+- **Quest Path** — the original gamified sequence with XP, locked levels, hints, and achievements.
+- **Class Lab** — teacher-guided lab briefs with starter code, lab steps, and success criteria.
 
 ## Running locally
 
@@ -21,9 +19,9 @@ Then open `http://localhost:4173` in a browser.
 ## Customising for a class
 
 - Edit `src/syllabus.js` to change the guided quest sequence.
-- Edit `unitLessons` in `src/app.js` to change unit explanations, sample code, JS practice prompts, and lab briefs.
-- The sidebar currently presents Unit 1 to Unit 10 using the first ten syllabus weeks.
+- Edit `practicePrompts` in `src/app.js` to add short starter drills.
+- Edit `classLabs` in `src/app.js` to add lab briefs, starter code, and success criteria.
 
 ## Monetization ideas to explore later
 
-Potential premium features could include teacher accounts, custom unit packs, lab libraries, class progress dashboards, downloadable reports, and private cohorts.
+Potential premium features could include teacher accounts, custom lab packs, class progress dashboards, downloadable reports, and private cohorts.

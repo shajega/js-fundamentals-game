@@ -3,228 +3,87 @@ import { syllabus } from './syllabus.js';
 const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
 const UNIT_COUNT = 10;
 
-const unitLessons = [
+const MODES = {
+  PRACTICE: 'practice',
+  QUEST: 'quest',
+  LAB: 'lab'
+};
+
+const modeDetails = {
+  [MODES.PRACTICE]: {
+    icon: '🧪',
+    label: 'Practice JS',
+    description: 'Warm up with short coding drills and instant console-style feedback.'
+  },
+  [MODES.QUEST]: {
+    icon: '⚔️',
+    label: 'Quest Path',
+    description: 'Complete the guided JS fundamentals adventure and unlock XP.'
+  },
+  [MODES.LAB]: {
+    icon: '🏫',
+    label: 'Class Lab',
+    description: 'Open a teacher-guided lab brief with starter code and success criteria.'
+  }
+};
+
+const practicePrompts = [
   {
-    title: 'JS Origins & Role',
-    focus: 'Understand what JavaScript is, why it exists, and where it runs.',
-    explanation: 'JavaScript started as the language that made web pages interactive. Today it is used in browsers, servers, mobile apps, desktop apps, and tooling. In this unit, students practise storing facts in variables and recognising JavaScript as part of the wider ECMAScript standard.',
-    sampleCode: "const creator = 'Brendan Eich';\nconst standard = 'ECMAScript';\nconst platforms = ['browser', 'server', 'mobile'];\n\nconsole.log(`${creator} created the language we use with the ${standard} standard.`);\nconsole.log(`JavaScript can run in the ${platforms.join(', ')}.`);",
-    practice: {
-      prompt: 'Create variables for a JavaScript fact, the year you learned it, and one place JavaScript can run. Log a short sentence using all three values.',
-      starter: "const jsFact = 'JavaScript makes pages interactive';\nconst yearLearned = 2026;\nconst platform = 'browser';\n\nconsole.log(`${jsFact}. I learned this in ${yearLearned}, and it runs in the ${platform}.`);"
-    },
-    lab: {
-      title: 'JavaScript Timeline Card',
-      duration: '30–40 min',
-      objective: 'Build a short timeline summary that explains why JavaScript matters.',
-      steps: [
-        'Store at least three facts about JavaScript in variables or an array.',
-        'Write a function that formats the facts into one readable summary.',
-        'Log the summary for a classmate to review.'
-      ],
-      starter: "const facts = ['Created for web interactivity', 'Standardised as ECMAScript', 'Runs beyond the browser'];\n\nfunction buildTimelineSummary(factList) {\n  // Return one useful summary sentence.\n}\n\nconsole.log(buildTimelineSummary(facts));"
-    }
+    title: 'Variable warm-up',
+    prompt: 'Create a variable called topic and set it to any JavaScript concept you want to revise. Then log it.',
+    starter: "let topic = 'arrays';\nconsole.log(`Today I am practising ${topic}.`);"
   },
   {
-    title: 'Data Types & Operators',
-    focus: 'Use primitive values, arithmetic, and comparisons to represent simple rules.',
-    explanation: 'Programs make decisions with data. Strings store text, numbers store quantities, booleans store true/false answers, and operators let us calculate or compare values.',
-    sampleCode: "const studentName = 'Sam';\nconst attempts = 3;\nconst score = 8 + 2;\nconst passed = score >= 10;\n\nconsole.log(`${studentName} passed: ${passed}`);\nconsole.log(`Attempts remaining: ${5 - attempts}`);",
-    practice: {
-      prompt: 'Create variables for a quiz score and passing score. Use a comparison operator to store whether the student passed, then log it.',
-      starter: "const quizScore = 7;\nconst passingScore = 6;\nconst didPass = quizScore >= passingScore;\n\nconsole.log(`Passed quiz: ${didPass}`);"
-    },
-    lab: {
-      title: 'Grade Calculator',
-      duration: '35–45 min',
-      objective: 'Use numbers and comparison operators to calculate a simple grade status.',
-      steps: [
-        'Create variables for student name, score, and maximum score.',
-        'Calculate the percentage score.',
-        'Create a boolean that stores whether the score is passing.',
-        'Log a clear grade report.'
-      ],
-      starter: "const studentName = 'Amina';\nconst score = 42;\nconst maxScore = 50;\n\nconst percentage = 0; // Calculate this.\nconst isPassing = false; // Compare against 70%.\n\nconsole.log(`${studentName}: ${percentage}% passing=${isPassing}`);"
-    }
+    title: 'Function reps',
+    prompt: 'Write a function that accepts a number and returns the number doubled. Log one test call.',
+    starter: 'function double(number) {\n  return number * 2;\n}\n\nconsole.log(double(6));'
   },
   {
-    title: 'Control Flow',
-    focus: 'Use if statements and loops to control what code runs and how often.',
-    explanation: 'Control flow lets code respond to conditions. Use if/else when a program needs to choose, and loops when a program needs to repeat a task.',
-    sampleCode: "let energy = 4;\n\nif (energy >= 5) {\n  console.log('Ready for the boss quest!');\n} else {\n  console.log('Recharge before the boss quest.');\n}\n\nwhile (energy < 5) {\n  energy++;\n}\n\nconsole.log(`Energy restored to ${energy}.`);",
-    practice: {
-      prompt: 'Write an if/else statement that recommends either “keep practising” or “start the quest” based on a readiness score.',
-      starter: "const readiness = 6;\n\nif (readiness >= 7) {\n  console.log('Start the quest');\n} else {\n  console.log('Keep practising');\n}"
-    },
-    lab: {
-      title: 'Study Streak Coach',
-      duration: '40–50 min',
-      objective: 'Use loops and decisions to build a simple study recommendation.',
-      steps: [
-        'Create a variable for current streak days.',
-        'Use a loop to simulate three more study days.',
-        'Use an if/else statement to recommend a next step.',
-        'Log the final streak and recommendation.'
-      ],
-      starter: "let streakDays = 2;\n\n// Add three more days with a loop.\n\nfunction getRecommendation(streak) {\n  // Return a recommendation based on the streak.\n}\n\nconsole.log(streakDays);\nconsole.log(getRecommendation(streakDays));"
-    }
-  },
-  {
-    title: 'Arrays',
-    focus: 'Store lists of values and process them with indexes, loops, and array methods.',
-    explanation: 'Arrays hold ordered collections. Students use arrays whenever they need a list of scores, names, tasks, inventory items, or results.',
-    sampleCode: "const questScores = [80, 72, 95];\nlet total = 0;\n\nfor (const score of questScores) {\n  total += score;\n}\n\nconst average = total / questScores.length;\nconsole.log(`Average score: ${average}`);",
-    practice: {
-      prompt: 'Create an array of three topics you want to revise. Add one more topic, then log the full list.',
-      starter: "const topics = ['variables', 'operators', 'loops'];\ntopics.push('arrays');\n\nconsole.log(topics);"
-    },
-    lab: {
-      title: 'Quest Score Analyzer',
-      duration: '45–60 min',
-      objective: 'Analyse a list of quest scores using arrays and loops.',
-      steps: [
-        'Store at least five numeric scores in an array.',
-        'Write a function that calculates the average score.',
-        'Write a function that finds the highest score.',
-        'Log a short progress report.'
-      ],
-      starter: "const scores = [80, 72, 95, 64, 88];\n\nfunction getAverageScore(scoreList) {\n  // Calculate and return the average.\n}\n\nfunction getHighestScore(scoreList) {\n  // Return the highest score.\n}\n\nconsole.log(getAverageScore(scores));\nconsole.log(getHighestScore(scores));"
-    }
-  },
-  {
-    title: 'Functions',
-    focus: 'Package reusable logic with parameters, return values, and scope.',
-    explanation: 'Functions make code reusable. A function can accept inputs, do a task, and return a value. Students should also notice which variables are available globally and locally.',
-    sampleCode: "const baseXp = 150;\n\nfunction calculateXp(questCount) {\n  return questCount * baseXp;\n}\n\nconsole.log(calculateXp(4));",
-    practice: {
-      prompt: 'Write a function that accepts a topic and returns a study reminder for that topic.',
-      starter: "function buildReminder(topic) {\n  return `Spend 10 minutes reviewing ${topic}.`;\n}\n\nconsole.log(buildReminder('functions'));"
-    },
-    lab: {
-      title: 'Profile Card Builder',
-      duration: '35–45 min',
-      objective: 'Use functions to build a reusable student profile summary.',
-      steps: [
-        'Create variables for name, skill level, favourite topic, and completed quests.',
-        'Write a function that returns a profile sentence.',
-        'Write a function that recommends the next study action.',
-        'Log both results.'
-      ],
-      starter: "const studentName = 'Amina';\nconst skillLevel = 'beginner';\nconst favouriteTopic = 'functions';\nconst completedQuests = 3;\n\nfunction buildProfile() {\n  // Return a profile sentence here.\n}\n\nfunction recommendNextStep() {\n  // Return a recommendation.\n}\n\nconsole.log(buildProfile());\nconsole.log(recommendNextStep());"
-    }
-  },
-  {
-    title: 'Modules',
-    focus: 'Organise code across files with imports and exports.',
-    explanation: 'Modules help teams split code into files. A file can export values or functions, and another file can import them. In this browser game, module syntax is also used to load the syllabus into the app.',
-    sampleCode: "// settings.js\nexport const baseUrl = 'https://api.example.com';\n\n// app.js\nimport { baseUrl } from './settings.js';\nconsole.log(baseUrl);",
-    practice: {
-      prompt: 'Write a short module-style snippet that exports a class name or imports a helper. You can run it as text practice in the editor.',
-      starter: "const classSettingsModule = `export const className = 'JS Fundamentals';`;\nconst importExample = `import { className } from './classSettings.js';`;\n\nconsole.log(classSettingsModule);\nconsole.log(importExample);"
-    },
-    lab: {
-      title: 'Class Settings Module Plan',
-      duration: '30–40 min',
-      objective: 'Plan how a small app could separate settings, helpers, and app code.',
-      steps: [
-        'Write two exports for values a class app might share.',
-        'Write an example import statement that uses one value.',
-        'Explain in a comment why modules help larger projects.'
-      ],
-      starter: "const settingsFile = `export const courseTitle = 'JS Quest';\nexport const weeklyXpTarget = 450;`;\nconst appFile = `import { courseTitle, weeklyXpTarget } from './settings.js';`;\nconst benefit = 'Modules keep shared settings reusable across files.';\n\nconsole.log(settingsFile);\nconsole.log(appFile);\nconsole.log(benefit);"
-    }
-  },
-  {
-    title: 'Asynchronous JS',
-    focus: 'Handle delayed work with promises, async functions, await, and errors.',
-    explanation: 'Some tasks take time, such as loading data from an API. JavaScript uses promises and async/await so the program can wait for results without freezing the whole page.',
-    sampleCode: "function loadQuestReward() {\n  return Promise.resolve('150 XP');\n}\n\nasync function showReward() {\n  const reward = await loadQuestReward();\n  console.log(`Reward unlocked: ${reward}`);\n}\n\nshowReward();",
-    practice: {
-      prompt: 'Create an async function that awaits a resolved promise and logs the result.',
-      starter: "async function practiseAsync() {\n  const message = await Promise.resolve('Async code complete');\n  console.log(message);\n}\n\npractiseAsync();"
-    },
-    lab: {
-      title: 'Async Reward Loader',
-      duration: '40–55 min',
-      objective: 'Use async/await to simulate loading a reward after a quest.',
-      steps: [
-        'Create a function that returns a Promise with a reward string.',
-        'Create an async function that awaits the reward.',
-        'Use try/catch inside the async function.',
-        'Log success or error feedback.'
-      ],
-      starter: "function fetchReward() {\n  return Promise.resolve('Badge unlocked');\n}\n\nasync function showReward() {\n  try {\n    // Await the reward here.\n  } catch (error) {\n    console.log(error.message);\n  }\n}\n\nshowReward();"
-    }
-  },
-  {
-    title: 'Events',
-    focus: 'Respond to user actions such as clicks, typing, and form submissions.',
-    explanation: 'Events connect code to user behaviour. A button click, key press, or form submit can trigger a function called an event handler.',
-    sampleCode: "const button = document.querySelector('#run-button');\n\nbutton.addEventListener('click', () => {\n  console.log('Button clicked!');\n});",
-    practice: {
-      prompt: 'Write a button click listener snippet. The editor will not create the button for you, but you can practise the event syntax.',
-      starter: "const startButton = {\n  addEventListener(eventName, handler) {\n    console.log(`Listening for ${eventName}`);\n    handler();\n  }\n};\n\nstartButton.addEventListener('click', () => {\n  console.log('Starting quest...');\n});"
-    },
-    lab: {
-      title: 'Interaction Plan',
-      duration: '35–45 min',
-      objective: 'Design the event logic for a simple interactive classroom tool.',
-      steps: [
-        'Choose one user action, such as clicking a start button.',
-        'Write a querySelector line for the element.',
-        'Attach an event listener.',
-        'Log or update a value inside the handler.'
-      ],
-      starter: "// Simulated button for this practice runner.\nconst checkButton = {\n  addEventListener(eventName, handler) {\n    console.log(`Ready for ${eventName}`);\n    handler();\n  }\n};\n\ncheckButton.addEventListener('click', () => {\n  console.log('Answer checked!');\n});"
-    }
-  },
-  {
-    title: 'DOM Manipulation',
-    focus: 'Select elements and update page content, attributes, or styles.',
-    explanation: 'The DOM is the browser representation of a web page. JavaScript can select elements and change what the user sees, which is how interactive pages update without reloading.',
-    sampleCode: "const message = document.querySelector('#message');\n\nmessage.textContent = 'Quest complete!';\nmessage.style.color = 'green';",
-    practice: {
-      prompt: 'Write a DOM snippet that selects an element and updates its text content.',
-      starter: "const statusMessage = { textContent: '' };\nstatusMessage.textContent = 'Ready for the next quest';\n\nconsole.log(statusMessage.textContent);"
-    },
-    lab: {
-      title: 'Feedback Panel Builder',
-      duration: '45–60 min',
-      objective: 'Plan DOM updates for a feedback panel in a learning app.',
-      steps: [
-        'Select a message element.',
-        'Write a function that accepts feedback text and a colour.',
-        'Update textContent and style inside the function.',
-        'Call the function with sample feedback.'
-      ],
-      starter: "const feedback = { textContent: '', style: { color: '' } };\n\nfunction updateFeedback(message, colour) {\n  feedback.textContent = message;\n  feedback.style.color = colour;\n}\n\nupdateFeedback('Great effort!', 'green');\nconsole.log(feedback.textContent);\nconsole.log(feedback.style.color);"
-    }
-  },
-  {
-    title: 'API Calls',
-    focus: 'Request data from APIs and use responses in an app.',
-    explanation: 'APIs let apps request data from other services. The fetch function returns a promise, so API work combines asynchronous JavaScript with response handling.',
-    sampleCode: "async function loadTodo() {\n  const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');\n  const todo = await response.json();\n  console.log(todo.title);\n}\n\nloadTodo();",
-    practice: {
-      prompt: 'Write an async function that fetches data, converts the response to JSON, and logs one property.',
-      starter: "async function loadData() {\n  const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');\n  const data = await response.json();\n  console.log(data.title);\n}\n\nloadData();"
-    },
-    lab: {
-      title: 'API Response Reporter',
-      duration: '50–65 min',
-      objective: 'Use fetch and async/await to load data and present a short report.',
-      steps: [
-        'Choose a public API endpoint or use the starter endpoint.',
-        'Fetch the data inside an async function.',
-        'Convert the response with .json().',
-        'Log two useful fields from the returned object.'
-      ],
-      starter: "async function loadReport() {\n  const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');\n  const data = await response.json();\n\n  // Log two useful fields here.\n}\n\nloadReport();"
-    }
+    title: 'Array sprint',
+    prompt: 'Loop through an array of scores and calculate the total. Log the total.',
+    starter: 'const scores = [4, 7, 9];\nlet total = 0;\n\nfor (const score of scores) {\n  total += score;\n}\n\nconsole.log(total);'
   }
 ];
 
-const units = [];
+const classLabs = [
+  {
+    title: 'Lab 1: Profile Card Builder',
+    duration: '35–45 min',
+    objective: 'Use variables, template literals, functions, and conditionals to build a reusable student profile summary.',
+    steps: [
+      'Create variables for name, skill level, favourite JS topic, and completed quest count.',
+      'Write a function that returns a short profile sentence using those variables.',
+      'Add a conditional that recommends the next study action based on completed quests.',
+      'Log the final profile and recommendation.'
+    ],
+    starter: "const studentName = 'Amina';\nconst skillLevel = 'beginner';\nconst favouriteTopic = 'functions';\nconst completedQuests = 3;\n\nfunction buildProfile() {\n  // Return a profile sentence here.\n}\n\nfunction recommendNextStep() {\n  // Return a recommendation based on completedQuests.\n}\n\nconsole.log(buildProfile());\nconsole.log(recommendNextStep());",
+    successCriteria: [
+      'Uses const or let appropriately.',
+      'Includes at least two functions.',
+      'Uses one if/else or ternary decision.',
+      'Produces readable output in the practice console.'
+    ]
+  },
+  {
+    title: 'Lab 2: Quest Score Analyzer',
+    duration: '45–60 min',
+    objective: 'Practise arrays, loops, and functions by analysing a small set of quest scores.',
+    steps: [
+      'Store at least five numeric scores in an array.',
+      'Write a function that calculates the average score.',
+      'Write a function that counts how many scores are passing.',
+      'Log a short progress report for the class.'
+    ],
+    starter: 'const scores = [80, 72, 95, 64, 88];\n\nfunction getAverageScore(scoreList) {\n  // Calculate and return the average.\n}\n\nfunction countPassingScores(scoreList) {\n  // Count scores that are 70 or higher.\n}\n\nconsole.log(`Average: ${getAverageScore(scores)}`);\nconsole.log(`Passing quests: ${countPassingScores(scores)}`);',
+    successCriteria: [
+      'Uses an array of numbers.',
+      'Uses at least one loop or array method.',
+      'Returns values from both functions.',
+      'Shows the results with console.log.'
+    ]
+  }
+];
+
 export const levels = [];
 let counter = 1;
 
@@ -251,32 +110,16 @@ syllabus.slice(0, UNIT_COUNT).forEach((week, index) => {
 const state = {
   xp: parseInt(localStorage.getItem('jsquests_xp')) || 0,
   unlockedLevel: parseInt(localStorage.getItem('jsquests_unlocked')) || 1,
-  currentUnit: parseInt(localStorage.getItem('jsquests_unit')) || 1,
-  currentQuestId: parseInt(localStorage.getItem('jsquests_quest')) || 1
+  currentLevel: 1,
+  mode: localStorage.getItem('jsquests_mode') || MODES.QUEST,
+  practicePrompt: 0,
+  activeLab: 0
 };
 
 function saveState() {
   localStorage.setItem('jsquests_xp', state.xp);
   localStorage.setItem('jsquests_unlocked', state.unlockedLevel);
-  localStorage.setItem('jsquests_unit', state.currentUnit);
-  localStorage.setItem('jsquests_quest', state.currentQuestId);
-}
-
-function getActiveUnit() {
-  return units.find(unit => unit.number === state.currentUnit) || units[0];
-}
-
-function getActiveQuest(unit = getActiveUnit()) {
-  return unit.quests.find(quest => quest.id === state.currentQuestId) || unit.quests[0];
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  localStorage.setItem('jsquests_mode', state.mode);
 }
 
 function initApp() {
@@ -285,63 +128,213 @@ function initApp() {
     <header class="app-header">
       <div class="brand-block">
         <div class="logo"><span>⚡</span> JS Quest: Classroom Edition</div>
-        <p>Choose a unit, teach the concept, practise JavaScript, complete a quest, then run a class lab.</p>
+        <p>Practise JavaScript, follow quests, or launch a class lab.</p>
       </div>
       <div class="header-actions">
         <div class="xp-pill" aria-live="polite">Current XP: <span id="xp-display">${state.xp}</span></div>
       </div>
     </header>
+    <nav class="mode-nav" aria-label="Learning mode selector">
+      ${Object.entries(modeDetails).map(([mode, detail]) => `
+        <button class="mode-tab ${state.mode === mode ? 'active' : ''}" data-mode="${mode}" aria-pressed="${state.mode === mode}">
+          <span aria-hidden="true">${detail.icon}</span>
+          <span>${detail.label}</span>
+        </button>
+      `).join('')}
+    </nav>
     <main class="app-main">
-      <aside class="sidebar" id="sidebar" aria-label="Unit Navigation"></aside>
-      <section class="content" id="level-container" aria-label="Unit Content" aria-live="polite"></section>
+      <aside class="sidebar" id="sidebar" aria-label="Learning Navigation"></aside>
+      <section class="content" id="level-container" aria-label="Learning Content" aria-live="polite"></section>
     </main>
   `;
 
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      state.mode = tab.dataset.mode;
+      saveState();
+      initApp();
+    });
+  });
+
   renderSidebar();
-  renderUnit();
+  renderContent();
+}
+
+function renderContent() {
+  if (state.mode === MODES.PRACTICE) {
+    renderPractice();
+    return;
+  }
+
+  if (state.mode === MODES.LAB) {
+    renderClassLab();
+    return;
+  }
+
+  renderLevel();
 }
 
 function renderSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.innerHTML = `
-    <div>
-      <h3 class="sidebar-heading">UNITS 1–10</h3>
-      <p class="sidebar-note">Each unit includes a lesson explanation, sample code, practice, quest, and lab.</p>
-    </div>
-    <ul class="level-list unit-list">
-      ${units.map(unit => {
-        const completedCount = unit.quests.filter(quest => quest.id < state.unlockedLevel).length;
-        const isActive = unit.number === state.currentUnit;
+  if (state.mode === MODES.PRACTICE) {
+    renderPracticeSidebar();
+    return;
+  }
 
-        return `
-          <li class="level-item unit-item ${isActive ? 'active' : ''}" data-unit-id="${unit.number}" role="button" tabindex="0" aria-current="${isActive ? 'step' : 'false'}">
-            <div class="icon" aria-hidden="true">${unit.number}</div>
-            <div class="level-label">
-              <div>Unit ${unit.number}</div>
-              <small>${unit.title}</small>
-              <span class="unit-progress">${completedCount}/${unit.quests.length} quests complete</span>
-            </div>
-          </li>
-        `;
-      }).join('')}
-    </ul>
-    <div class="achievement-panel">
-      <h3 class="sidebar-heading">ACHIEVEMENTS</h3>
-      <div class="achievement-grid">
-        ${state.unlockedLevel > 3 ? '<div class="achievement unlocked">💎</div>' : '<div class="achievement locked">🔒</div>'}
-        ${state.unlockedLevel > 8 ? '<div class="achievement unlocked">🔥</div>' : '<div class="achievement locked">🔒</div>'}
-        ${state.unlockedLevel > 15 ? '<div class="achievement unlocked">🏆</div>' : '<div class="achievement locked">🔒</div>'}
+  if (state.mode === MODES.LAB) {
+    renderLabSidebar();
+    return;
+  }
+
+  renderQuestSidebar();
+}
+
+function renderModeIntro(mode) {
+  const detail = modeDetails[mode];
+  return `
+    <div class="mode-intro">
+      <div class="mode-intro-icon" aria-hidden="true">${detail.icon}</div>
+      <div>
+        <p class="eyebrow">${detail.label}</p>
+        <h2>${detail.description}</h2>
       </div>
     </div>
   `;
+}
 
-  document.querySelectorAll('[data-unit-id]').forEach(item => {
-    const selectUnit = () => {
-      state.currentUnit = parseInt(item.dataset.unitId);
-      state.currentQuestId = getActiveUnit().quests[0].id;
-      saveState();
+function renderPracticeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = `
+    <div>
+      <h3 class="sidebar-heading">PRACTICE DRILLS</h3>
+      <p class="sidebar-note">Choose a starter drill, edit freely, and run it without affecting quest XP.</p>
+    </div>
+    <ul class="level-list">
+      ${practicePrompts.map((prompt, index) => `
+        <li class="level-item ${index === state.practicePrompt ? 'active' : ''}" data-practice-id="${index}" role="button" tabindex="0" aria-current="${index === state.practicePrompt ? 'step' : 'false'}">
+          <div class="icon" aria-hidden="true">${index + 1}</div>
+          <div>
+            <div>${prompt.title}</div>
+            <small>${prompt.prompt}</small>
+          </div>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+
+  document.querySelectorAll('[data-practice-id]').forEach(item => {
+    const selectPractice = () => {
+      state.practicePrompt = parseInt(item.dataset.practiceId);
       renderSidebar();
-      renderUnit();
+      renderPractice();
+    };
+    item.addEventListener('click', selectPractice);
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectPractice();
+      }
+    });
+  });
+}
+
+function renderLabSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = `
+    <div>
+      <h3 class="sidebar-heading">CLASS LABS</h3>
+      <p class="sidebar-note">Use these as editable lab briefs now. Later, this area can become a paid teacher workspace.</p>
+    </div>
+    <ul class="level-list">
+      ${classLabs.map((lab, index) => `
+        <li class="level-item ${index === state.activeLab ? 'active' : ''}" data-lab-id="${index}" role="button" tabindex="0" aria-current="${index === state.activeLab ? 'step' : 'false'}">
+          <div class="icon" aria-hidden="true">${index + 1}</div>
+          <div>
+            <div>${lab.title}</div>
+            <small>${lab.duration}</small>
+          </div>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+
+  document.querySelectorAll('[data-lab-id]').forEach(item => {
+    const selectLab = () => {
+      state.activeLab = parseInt(item.dataset.labId);
+      renderSidebar();
+      renderClassLab();
+    };
+    item.addEventListener('click', selectLab);
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectLab();
+      }
+    });
+  });
+}
+
+function renderQuestSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  let html = '<div><h3 id="progress-heading" class="sidebar-heading">MY PROGRESS</h3><p class="sidebar-note">Complete quests in order to unlock the next challenge.</p></div>';
+  
+  syllabus.forEach(week => {
+    const weekId = `week-heading-${week.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`;
+    html += `<div class="week-group">
+               <h4 id="${weekId}" class="week-heading">${week.title}</h4>
+               <ul class="level-list" aria-labelledby="progress-heading ${weekId}">`;
+    
+    week.quests.forEach(q => {
+      const isUnlocked = q.id <= state.unlockedLevel;
+      const isActive = q.id === state.currentLevel;
+      const isCompleted = q.id < state.unlockedLevel;
+      
+      let icon = q.id;
+      let classes = 'level-item';
+      if (isActive) classes += ' active';
+      else if (isCompleted) { classes += ' completed'; icon = '✓'; }
+      else if (!isUnlocked) { classes += ' locked'; icon = '🔒'; }
+
+      const badge = q.isSideQuest ? '<span class="side-quest-badge">Side Quest</span>' : '';
+
+      html += `
+        <li class="${classes}" data-id="${q.id}" role="button" tabindex="${!isUnlocked ? '-1' : '0'}" aria-current="${isActive ? 'step' : 'false'}" ${!isUnlocked ? 'aria-disabled="true"' : ''}>
+            <div class="icon" aria-hidden="true">${icon}</div>
+            <div class="level-label">
+                <div>${q.shortTitle || q.title}</div>
+            </div>
+            ${badge}
+        </li>
+      `;
+    });
+    html += '</ul></div>';
+  });
+  
+  html += `
+    <div class="achievement-panel">
+      <h3 class="sidebar-heading">ACHIEVEMENTS</h3>
+      <div id="achievements-container" class="achievement-grid">
+        <!-- Filled based on progress -->
+      </div>
+    </div>
+  `;
+  
+  sidebar.innerHTML = html;
+
+  const achievementsDiv = document.getElementById('achievements-container');
+  let achHtml = '';
+  achHtml += state.unlockedLevel > 3 ? '<div class="achievement unlocked">💎</div>' : '<div class="achievement locked">🔒</div>';
+  achHtml += state.unlockedLevel > 8 ? '<div class="achievement unlocked">🔥</div>' : '<div class="achievement locked">🔒</div>';
+  achHtml += state.unlockedLevel > 15 ? '<div class="achievement unlocked">🏆</div>' : '<div class="achievement locked">🔒</div>';
+  achievementsDiv.innerHTML = achHtml;
+
+  document.querySelectorAll('.level-item[data-id]').forEach(item => {
+    const trigger = (e) => {
+      const id = parseInt(e.currentTarget.dataset.id);
+      if (id <= state.unlockedLevel) {
+        state.currentLevel = id;
+        renderQuestSidebar();
+        renderLevel();
+      }
     };
 
     item.addEventListener('click', selectUnit);
@@ -354,16 +347,92 @@ function renderSidebar() {
   });
 }
 
-function renderUnit() {
+function renderPractice() {
+  const container = document.getElementById('level-container');
+  const prompt = practicePrompts[state.practicePrompt];
+
+  container.innerHTML = `
+    ${renderModeIntro(MODES.PRACTICE)}
+    <div class="level-card">
+      <div class="task-box">
+        <strong>${prompt.title}</strong> ${prompt.prompt}
+      </div>
+      <div class="editor-container">
+        <label for="practice-editor" class="sr-only">Practice JavaScript editor</label>
+        <textarea id="practice-editor" spellcheck="false" aria-label="Write practice JavaScript code here">${prompt.starter}</textarea>
+      </div>
+      <div class="action-bar">
+        <button id="btn-practice-run" class="primary-btn">▶ Run Practice</button>
+        <button id="btn-practice-reset" class="secondary-btn">Reset Starter</button>
+      </div>
+      <div id="practice-output" class="feedback-box hidden" aria-live="polite"></div>
+    </div>
+  `;
+
+  document.getElementById('btn-practice-run').addEventListener('click', runPracticeCode);
+  document.getElementById('btn-practice-reset').addEventListener('click', () => {
+    document.getElementById('practice-editor').value = prompt.starter;
+    document.getElementById('practice-output').classList.add('hidden');
+  });
+}
+
+function renderClassLab() {
+  const container = document.getElementById('level-container');
+  const lab = classLabs[state.activeLab];
+
+  container.innerHTML = `
+    ${renderModeIntro(MODES.LAB)}
+    <div class="lab-layout">
+      <article class="lab-brief">
+        <div class="level-header">
+          <h2>${lab.title}</h2>
+          <span class="badge">${lab.duration}</span>
+        </div>
+        <p class="explanation">${lab.objective}</p>
+        <div class="task-box">
+          <strong>Lab steps</strong>
+          <ol class="lab-list">
+            ${lab.steps.map(step => `<li>${step}</li>`).join('')}
+          </ol>
+        </div>
+        <div class="task-box success-criteria">
+          <strong>Success criteria</strong>
+          <ul class="lab-list">
+            ${lab.successCriteria.map(criteria => `<li>${criteria}</li>`).join('')}
+          </ul>
+        </div>
+      </article>
+      <section class="level-card">
+        <div class="editor-container">
+          <label for="lab-editor" class="sr-only">Class lab JavaScript editor</label>
+          <textarea id="lab-editor" spellcheck="false" aria-label="Write class lab JavaScript code here">${lab.starter}</textarea>
+        </div>
+        <div class="action-bar">
+          <button id="btn-lab-run" class="primary-btn">▶ Run Lab Code</button>
+          <button id="btn-lab-reset" class="secondary-btn">Reset Starter</button>
+        </div>
+        <div id="lab-output" class="feedback-box hidden" aria-live="polite"></div>
+      </section>
+    </div>
+  `;
+
+  document.getElementById('btn-lab-run').addEventListener('click', runLabCode);
+  document.getElementById('btn-lab-reset').addEventListener('click', () => {
+    document.getElementById('lab-editor').value = lab.starter;
+    document.getElementById('lab-output').classList.add('hidden');
+  });
+}
+
+function renderLevel() {
   const container = document.getElementById('level-container');
   const unit = getActiveUnit();
   const quest = getActiveQuest(unit);
 
   container.innerHTML = `
-    <div class="unit-hero">
-      <p class="eyebrow">Unit ${unit.number}</p>
-      <h1>${unit.title}</h1>
-      <p>${unit.focus}</p>
+    ${renderModeIntro(MODES.QUEST)}
+    <div class="level-header">
+      <h2>${lvl.weekTitle}: ${lvl.title}</h2>
+      ${isCompleted ? '<span class="badge completed-badge" aria-label="Status: Completed">Completed</span>' : ''}
     </div>
 
     <section class="unit-section lesson-grid" aria-labelledby="lesson-heading">
@@ -513,11 +582,16 @@ function wireUnitInteractions(unit) {
     const isHidden = hintText.classList.contains('hidden');
     e.target.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
   });
-
-  document.getElementById('btn-run').addEventListener('click', runQuestCode);
-  document.getElementById('btn-next').addEventListener('click', goToNextQuest);
-
-  if (state.currentQuestId < state.unlockedLevel && state.currentQuestId < levels.length) {
+  document.getElementById('btn-run').addEventListener('click', runCode);
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (state.currentLevel < levels.length) {
+      state.currentLevel++;
+      renderQuestSidebar();
+      renderLevel();
+    }
+  });
+  
+  if (state.currentLevel < state.unlockedLevel && state.currentLevel < levels.length) {
     document.getElementById('btn-next').classList.remove('hidden');
   }
 }
@@ -552,7 +626,7 @@ async function runUserCode(editorId, outputId) {
       result !== undefined ? `Returned: ${result}` : ''
     ].filter(Boolean).join('\n') || 'Code ran successfully. Add console.log(...) to show output.';
 
-    showFeedback('success', `<pre>${escapeHtml(output)}</pre>`, outputId);
+    showFeedback('success', `<pre>${output}</pre>`, outputId);
   } catch (error) {
     let friendlyError = error.message;
     if (error instanceof ReferenceError) {
@@ -560,11 +634,19 @@ async function runUserCode(editorId, outputId) {
     } else if (error instanceof SyntaxError) {
       friendlyError = `Looks like a typo! Check brackets and semicolons. (${error.message})`;
     }
-    showFeedback('error', `<b>Error:</b> ${escapeHtml(friendlyError)}`, outputId);
+    showFeedback('error', `<b>Error:</b> ${friendlyError}`, outputId);
   }
 }
 
-async function runQuestCode() {
+function runPracticeCode() {
+  runUserCode('practice-editor', 'practice-output');
+}
+
+function runLabCode() {
+  runUserCode('lab-editor', 'lab-output');
+}
+
+async function runCode() {
   const code = document.getElementById('code-editor').value;
   const unit = getActiveUnit();
   const quest = getActiveQuest(unit);
@@ -627,7 +709,7 @@ function handleQuestSuccess(quest) {
     saveState();
 
     document.getElementById('xp-display').innerText = state.xp;
-    renderSidebar();
+    renderQuestSidebar();
   }
 
   if (quest.id < levels.length) {
