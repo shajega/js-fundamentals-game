@@ -67,7 +67,7 @@ body {
     flex-shrink: 0;
 }
 
-.app-header h1 {
+.logo {
     font-weight: 800;
     font-size: 24px;
     color: var(--primary);
@@ -76,13 +76,197 @@ body {
     gap: 10px;
 }
 
-.xp-badge {
+.xp-pill {
     background: #e0e7ff;
     color: var(--primary);
     padding: 6px 16px;
     border-radius: 999px;
     font-weight: 700;
     font-size: 14px;
+}
+
+
+.brand-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.brand-block p {
+    color: var(--text-light);
+    font-size: 13px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mode-nav {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 12px 32px;
+}
+
+.mode-tab {
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    color: var(--text);
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 16px;
+    transition: all 0.2s;
+}
+
+.mode-tab:hover,
+.mode-tab.active {
+    background: #eef2ff;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.mode-intro {
+    align-items: center;
+    background: linear-gradient(135deg, #eef2ff, #ecfdf5);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+}
+
+.mode-intro-icon {
+    align-items: center;
+    background: var(--card);
+    border-radius: 16px;
+    display: flex;
+    font-size: 28px;
+    height: 56px;
+    justify-content: center;
+    width: 56px;
+}
+
+.mode-intro h2 {
+    font-size: 22px;
+    line-height: 1.25;
+}
+
+.eyebrow,
+.sidebar-heading,
+.week-heading {
+    color: var(--text-light);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.sidebar-note {
+    color: var(--text-light);
+    font-size: 13px;
+    line-height: 1.4;
+    margin-top: 8px;
+}
+
+.week-group,
+.achievement-panel {
+    margin-top: 24px;
+}
+
+.week-heading {
+    margin-bottom: 8px;
+}
+
+.level-label {
+    flex: 1;
+}
+
+.level-item small {
+    color: var(--text-light);
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.35;
+    margin-top: 2px;
+}
+
+.side-quest-badge {
+    background: #fef3c7;
+    border-radius: 4px;
+    color: #92400e;
+    font-size: 10px;
+    margin-left: auto;
+    padding: 2px 6px;
+}
+
+.achievement-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.achievement {
+    align-items: center;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+}
+
+.achievement.unlocked {
+    background: #fef3c7;
+    border: 2px solid var(--accent);
+}
+
+.achievement.locked {
+    background: #f3f4f6;
+    border: 2px dashed #d1d5db;
+}
+
+.completed-badge {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.lab-layout {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+}
+
+.lab-brief {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.lab-list {
+    margin-left: 20px;
+}
+
+.lab-list li + li {
+    margin-top: 8px;
+}
+
+.success-criteria {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+.feedback-box pre {
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 /* --- Main Layout --- */
@@ -265,7 +449,7 @@ body {
     color: var(--text-light);
 }
 
-#code-editor {
+#code-editor, #practice-editor, #lab-editor {
     width: 100%;
     min-height: 200px;
     background: var(--editor-bg);
@@ -278,7 +462,7 @@ body {
     resize: vertical;
 }
 
-#code-editor:focus {
+#code-editor:focus, #practice-editor:focus, #lab-editor:focus {
     outline: none;
     box-shadow: inset 0 0 0 2px var(--primary);
 }
@@ -393,5 +577,8 @@ button.primary-btn:hover, button.secondary-btn:hover {
     
     .content { padding: 20px; }
     
+    .mode-nav { grid-template-columns: 1fr; padding: 12px 20px; }
+    .app-header { align-items: flex-start; flex-direction: column; height: auto; gap: 12px; padding: 16px 20px; }
+    .lab-layout { grid-template-columns: 1fr; }
     .action-bar { flex-direction: column; align-items: stretch; }
 }
